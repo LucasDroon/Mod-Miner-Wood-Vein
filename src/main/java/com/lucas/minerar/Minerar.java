@@ -53,6 +53,48 @@ public class Minerar implements ModInitializer {
 		return visited;
 	}
 
+	public Set<BlockPos> getDynamicFacingBlocks(Direction facingDirection, BlockPos pos){
+		boolean northSouth = facingDirection == Direction.NORTH || facingDirection == Direction.SOUTH;
+
+		BlockPos up = pos.offset(Direction.UP);
+		BlockPos down = pos.offset(Direction.DOWN);
+
+		Direction left = null;
+		Direction right = null;
+		Set<BlockPos> neighbors = new HashSet<>();
+
+
+		// leste = norte e oeste = sul | norte = oeste e sul = leste
+		if (northSouth) {
+			right = Direction.EAST;
+			left = Direction.WEST;
+		}
+		else {
+			right = Direction.NORTH;
+			left = Direction.SOUTH;
+		}
+
+		//Parte superior do 3x3 (1x3)
+		neighbors.add(up);
+		neighbors.add(up.offset(right));
+		neighbors.add(up.offset(left));
+
+		//Parte central do 3x3 (2x3)
+		neighbors.add(pos.offset(right));
+		neighbors.add(pos.offset(left));
+
+		//Parte inferior do 3x3 (3x3)
+		neighbors.add(down.offset(right));
+		neighbors.add(down.offset(left));
+		neighbors.add(down);
+
+		return neighbors;
+	}
+
+	public Set<BlockPos> getNeighborsPosition(BlockPos pos, Direction facingDirection){
+			return getDynamicFacingBlocks(facingDirection, pos);
+	}
+
 	public void dropVein(World world, PlayerEntity player, BlockPos pos, BlockState state){
 			List<ItemStack> drops = state.getDroppedStacks(new LootWorldContext.Builder((ServerWorld) world).add(LootContextParameters.ORIGIN, Vec3d.ofCenter(pos)).add(LootContextParameters.TOOL, player.getMainHandStack()));
 
@@ -66,6 +108,9 @@ public class Minerar implements ModInitializer {
 	public void breakVein(World world, BlockPos pos){
 			world.breakBlock(pos, false);
 		}
+	public void break3x3(World world, BlockPos pos){
+			world.breakBlock(pos, true);
+		}
 
 	@Override
 	public void onInitialize() {
@@ -76,6 +121,16 @@ public class Minerar implements ModInitializer {
 
 		boolean isOre = state.isIn(TagKey.of(RegistryKeys.BLOCK, Identifier.of("c", "ores")));
 		boolean isWood = state.isIn(BlockTags.LOGS);
+		boolean isGoldenPickaxe = false;
+
+		//Verifica se o bloco foi quebrado com uma picareta de ouro
+		if (player.getMainHandStack().getItem() == Items.GOLDEN_PICKAXE){
+			 isGoldenPickaxe = true;
+			 LOGGER.info("DEBUG: Sim, e picareta de ouro.");
+		}
+		else {
+			LOGGER.info("DEBUG: Nao e picareta de ouro.");
+		}
 
 		//Vein miner para minerios
 		if (isOre) {
@@ -89,9 +144,21 @@ public class Minerar implements ModInitializer {
 			}
 
 			LOGGER.info("(BEFORE) Quebrei o minério: " + state.getBlock().getName().getString());
+			return true;
 		}
 		else {
 			LOGGER.info("DEBUG: Não é minério, é: " + state.getBlock().getName().getString());
+		}
+
+		if (isGoldenPickaxe){
+			Direction facingDirection = player.getFacing();
+			Set<BlockPos> blocos = getNeighborsPosition(pos, facingDirection);
+			blocos.remove(pos);
+
+			for (BlockPos bloco : blocos){
+				break3x3(world, bloco);
+			}
+
 		}
 
 		//Vein miner para madeiras (só funfa com machado de ouro).

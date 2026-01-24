@@ -1,41 +1,40 @@
 # ⛏️ Minervein Mod
 
-**Minervein** é um mod simples e eficiente para **Minecraft Fabric** que facilita a coleta de recursos através da mecânica de *Vein Mining* (mineração em cadeia).
-
-O objetivo deste mod é agilizar o jogo vanilla mantendo o equilíbrio: você ainda precisa das ferramentas corretas para minerar, e o corte de árvores exige um item especial.
+**Minervein** é um mod para **Minecraft Fabric** que aprimora a mineração e coleta de recursos.
+O principal objetivo do mod é trazer "Qualidade de Vida" (QoL) sem quebrar o equilíbrio do jogo, além de **finalmente dar uma utilidade valiosa para as ferramentas de Ouro**.
 
 ## ✨ Funcionalidades
 
-### 💎 Mineração de Minérios (Ores)
-Ao quebrar um bloco de minério, todos os minérios idênticos conectados a ele serão quebrados e dropados automaticamente.
-* **Compatibilidade:** Funciona com minérios padrão e de outros mods (tag `c:ores`).
-* **Requisitos:** O jogador precisa ter a ferramenta correta capaz de coletar o item (ex: não é possível quebrar Diamante com picareta de madeira).
-* **Restrição:** Não funciona no modo Criativo.
+### 💎 Mineração de Minérios (Vein Mining)
+Ao quebrar um minério, todos os blocos idênticos conectados são quebrados em cadeia.
+* **Inteligente:** Efeitos de encantamento, como fortuna, influenciam na quantidade de minérios a serem dropados.
+* **Compatibilidade:** Suporta minérios vanilla e de mods (tag `c:ores`).
+* **Restrição:** Funciona apenas no modo Sobrevivência e só funciona se você tiver a ferramenta correta para aquele minério (ex: não quebra diamante com picareta de pedra).
 
 ### 🪓 Corte de Árvores (Tree Felling)
-Derrube árvores inteiras quebrando apenas um bloco do tronco!
-* **Mecânica Única:** Para evitar que você destrua sua casa de madeira sem querer, esta função **só é ativada se você usar um Machado de Ouro**.
-* **Motivo:** Isso dá uma utilidade real e valiosa para o ouro no jogo além de evitar acidentes em casas e construções com madeira.
+Derrube a árvore inteira quebrando apenas um bloco do tronco.
+* **Requisito Especial:** Funciona **exclusivamente com o Machado de Ouro**.
+* **Equilíbrio:** Evita que você destrua sua própria casa de madeira acidentalmente (já que ninguém costuma usar e reparar com um machado de ouro) e valoriza o item.
+
+### 🔨 Tunelamento 3x3 (Area Mining)
+Facilite sua construção de túneis e busca por minérios. Quebra uma área de 3x3 blocos de uma vez.
+* **Requisito Especial:** Funciona **exclusivamente com a Picareta de Ouro**.
+* **Dinâmico:** A área de quebra se adapta baseada na direção em que o jogador está olhando (norte, sul, leste e oeste).
 
 ## 🛠️ Instalação
 
-1. Certifique-se de ter o **Fabric Loader** instalado.
+1. Instale o **Fabric Loader**.
 2. Baixe a **Fabric API** e coloque na pasta `/mods`.
-3. Baixe o arquivo `.jar` do **Minervein** (na aba Releases) e coloque na pasta `/mods`.
-4. Inicie o jogo!
+3. Baixe o **Minervein** (.jar) e coloque na pasta `/mods`.
 
-## ⚙️ Como funciona (Técnico)
+## ⚙️ Detalhes Técnicos
 
-O mod utiliza o sistema de eventos do Fabric (`PlayerBlockBreakEvents`).
-- Para **minérios**, ele verifica a tag `c:ores` e utiliza um algoritmo de busca (Breadth-First Search) para encontrar blocos vizinhos iguais.
-- Para **madeira**, ele verifica a tag `minecraft:logs` e valida se o item na mão principal é `Items.GOLDEN_AXE`.
+O mod é focado em performance para evitar lag no servidor durante a quebra de múltiplos blocos.
 
-## 📋 Requisitos
-
-* Minecraft (Versão correspondente ao mod)
-* Fabric Loader
-* Fabric API
+- **Minérios:** Utiliza *Breadth-First Search (BFS)* para localizar veios conectados.
+- **3x3 e Árvores:** Utiliza um algoritmo direcional otimizado (`Smart Directional Lookup`) para calcular os vizinhos sem excesso de alocação de memória.
+- **Tags:** Utiliza as tags padrão `c:ores` e `minecraft:logs` para máxima compatibilidade.
 
 ## 📝 Licença
 
-Este projeto é de código aberto. Sinta-se à vontade para estudar o código ou contribuir!
+Este projeto é de código aberto. Sinta-se à vontade para contribuir!
